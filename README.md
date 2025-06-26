@@ -1,2 +1,3 @@
 # Espeek
-Espeek is a Pokédex mobile friendly webapp
+
+Espeek is a mobile friendly webapp Pokédex

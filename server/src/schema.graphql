@@ -1,0 +1,68 @@
+"A type that represents a pokemon"
+type Pokemon {
+  "The pokemon's pokedex ID"
+  id: ID!
+  "The pokemon's name"
+  name: String!
+  "The pokemon's height"
+  height: Int!
+  "The pokemon's weight"
+  weight: Int!
+  "A set of cries used to depict this Pokémon in the game."
+  cries: PokemonCries!
+  "A list of details showing types this Pokémon has."
+  types: [PokemonType!]!
+}
+
+type Generation {
+  "The generation's ID"
+  id: ID!
+  "The generation's name"
+  name: String!
+  "The main region travelled in this generation."
+  main_region: Region!
+  "The pokemon species in this generation"
+  pokemon_species: [PokemonSpecies!]!
+}
+
+type PokemonSpecies {
+  "The pokemon species' ID"
+  id: ID!
+  "The pokemon species' name"
+  name: String!
+}
+
+type Region {
+  "The region's ID"
+  id: ID!
+  "The region's name"
+  name: String!
+}
+
+type PokemonCries {
+  "The latest depiction of this Pokémon's cry."
+  latest: String!
+  "The legacy depiction of this Pokémon's cry."
+  legacy: String!
+}
+
+type PokemonType {
+  "The order the Pokémon's types are listed in."
+  slot: Int!
+  "The type the referenced Pokémon has."
+  type: Type!
+}
+
+type Type {
+  "The type's ID"
+  id: ID!
+  "The type's name"
+  name: String!
+}
+
+type Query {
+  "Fetch a pokemon by its pokedex number"
+  pokemon(id: Int!): Pokemon
+  "Fetch a generation by its number"
+  generation(generationNumber: Int!): Generation
+}
