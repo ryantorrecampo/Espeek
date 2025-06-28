@@ -12,6 +12,14 @@ type Pokemon {
   cries: PokemonCries!
   "A list of details showing types this Pokémon has."
   types: [PokemonType!]!
+  "A list of abilities this Pokémon could potentially have."
+  abilities: [PokemonAbility!]!
+  "A set of sprites used to depict this Pokémon in the game."
+  sprites: PokemonSprites!
+  "The artwork depicting this Pokémon."
+  artwork: String!
+  "The name of this resource listed in different languages."
+  names: [Name!]!
 }
 
 type Generation {
@@ -29,6 +37,24 @@ type PokemonSpecies {
   "The pokemon species' ID"
   id: ID!
   "The pokemon species' name"
+  name: String!
+  "The pokemon species' url"
+  url: String!
+  "The name of this resource listed in different languages."
+  names: [Name!]!
+}
+
+type Name {
+  "The name of this resource in a specific language."
+  name: String!
+  "The language this name is in."
+  language: Language!
+}
+
+type Language {
+  "The language's ID"
+  id: ID!
+  "The language's name"
   name: String!
 }
 
@@ -60,9 +86,46 @@ type Type {
   name: String!
 }
 
+type PokemonSprites {
+  "The default depiction of this Pokémon from the front in battle."
+  front_default: String!
+  "The shiny depiction of this Pokémon from the front in battle."
+  front_shiny: String
+  "The female depiction of this Pokémon from the front in battle."
+  front_female: String
+  "The shiny female depiction of this Pokémon from the front in battle."
+  front_shiny_female: String
+  "The default depiction of this Pokémon from the back in battle."
+  back_default: String!
+  "The shiny depiction of this Pokémon from the back in battle."
+  back_shiny: String
+  "The female depiction of this Pokémon from the back in battle."
+  back_female: String
+  "The shiny female depiction of this Pokémon from the back in battle."
+  back_shiny_female: String
+}
+
+type PokemonAbility {
+  "The order the Pokémon's abilities are listed in."
+  slot: Int!
+  "The ability this Pokémon has."
+  ability: Ability!
+}
+
+type Ability {
+  "The ability's name"
+  name: String!
+  "The ability's url"
+  url: String!
+  "The name of this resource listed in different languages."
+  names: [Name!]!
+}
+
 type Query {
   "Fetch a pokemon by its pokedex number"
-  pokemon(id: Int!): Pokemon
+  pokemon(id: Int, name: String): Pokemon
+  "Fetch a pokemon species by its ID or name"
+  pokemonSpecies(id: Int, name: String): PokemonSpecies
   "Fetch a generation by its number"
   generation(generationNumber: Int!): Generation
 }
