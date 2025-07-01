@@ -56,7 +56,7 @@ function PokemonList() {
   if (error) return <p>Error! {error.message}</p>
 
   return (
-    <Stack height="100%" gap={2} p={2}>
+    <Stack height="100%" gap={4} p={2} w={250}>
       <InputGroup startElement={<SearchIcon size={"15px"} />}>
         <Input placeholder="Search" borderRadius="sm" value={search} onChange={(e) => setSearch(e.target.value)} />
       </InputGroup>

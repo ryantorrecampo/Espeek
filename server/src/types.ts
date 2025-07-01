@@ -141,7 +141,7 @@ export type PokemonCries = {
   /** The latest depiction of this Pokémon's cry. */
   latest: Scalars['String']['output'];
   /** The legacy depiction of this Pokémon's cry. */
-  legacy: Scalars['String']['output'];
+  legacy?: Maybe<Scalars['String']['output']>;
 };
 
 export type PokemonMove = {
@@ -491,7 +491,7 @@ export type PokemonAbilityResolvers<ContextType = DataSourceContext, ParentType 
 
 export type PokemonCriesResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['PokemonCries'] = ResolversParentTypes['PokemonCries']> = {
   latest?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  legacy?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  legacy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

@@ -7,13 +7,14 @@ import { useQuery } from "@apollo/client"
 import { AudioLinesIcon, CircleCheckIcon, HashIcon } from "lucide-react"
 import { Badge, Button, DataList, Flex, Heading, HStack, IconButton, Skeleton, SkeletonCircle, SkeletonText, Stack, useToken, VStack } from "@chakra-ui/react"
 import { PokemonEvolutionChain } from "./PokemonEvolutionChain"
+import { PokemonMoves } from "./PokemonMoves"
 
 interface PokemonCardProps {
   pokemonId: number
 }
 
 const PokemonCard = ({ pokemonId }: PokemonCardProps) => {
-  const { language } = useUIStore()
+  const { language, generation } = useUIStore()
   const { loading, error, data } = useQuery(GET_POKEMON, {
     variables: { pokemonId: pokemonId },
   })
@@ -35,8 +36,9 @@ const PokemonCard = ({ pokemonId }: PokemonCardProps) => {
   if (error) return <div>Error! {error?.message}</div>
 
   return (
-    <Flex wrap="wrap" height={"100%"}>
-      <Flex direction="column" bgColor={"bg.card"} borderRadius="md" boxShadow="sm" p={4} gap={2} alignItems="center" justifyContent="flex-start" w="100%" maxW="400px">
+    <Flex wrap="wrap" height={"fit-content"} bgColor={"bg.card"} borderRadius="md" boxShadow="sm">
+      <Flex flexDirection={"column"} p={4} gap={2} alignItems="center" justifyContent="flex-start" maxWidth="400px">
+        {/* Header */}
         <VStack backgroundColor={""} justifyContent="space-between" alignItems="center" w={"100%"} maxW="400px">
           <Flex justifyContent={"space-between"} alignItems="center" w="100%">
             <Flex gap={2} alignItems="center">
@@ -70,7 +72,7 @@ const PokemonCard = ({ pokemonId }: PokemonCardProps) => {
                 height: 30,
               }}
               onClick={() => {
-                const audio = new Audio(pokemon.cries.legacy)
+                const audio = new Audio(pokemon.cries.legacy || pokemon.cries.latest)
                 audio.volume = 0.2
                 audio.play()
               }}
@@ -111,41 +113,43 @@ const PokemonCard = ({ pokemonId }: PokemonCardProps) => {
             />
           )} */}
         </HStack>
-        <PokemonEvolutionChain />
-        <Flex gap={5} flexDirection={"column"}>
-          <VStack alignItems="flex-start">
-            <Heading size="lg" color="#A16CCF">
-              Base Stats
-            </Heading>
-            <Flex wrap="wrap" gap={4} justifyContent="space-between" alignItems="flex-start" w="100%">
-              {pokemon.stats.map((stat) => (
-                <Flex key={stat.stat.name} direction="column" alignItems="flex-start" gap={1} w="110px">
-                  <Heading size="sm" color="fg.muted">
-                    {stat.stat.name.split("-").map(capitalizeFirstLetter).join(" ")}
-                  </Heading>
+      </Flex>
+      <Flex flexDirection={"column"} p={4} gap={4} alignItems="center" justifyContent="flex-start" maxWidth="400px" height={"50%"} flex={1}>
+        <VStack alignItems="flex-start" w={"100%"}>
+          <Heading size="lg" color="#A16CCF">
+            Abilities
+          </Heading>
+          <DataList.Root orientation={"vertical"} style={{ overflowY: "auto" }}>
+            {pokemon.abilities.map((ability) => {
+              return (
+                <DataList.Item key={ability.ability.name}>
+                  <DataList.ItemLabel fontWeight={500}>{ability.ability.names.find((n) => n.language.name === language)?.name || ability.ability.name}</DataList.ItemLabel>
+                  <DataList.ItemValue textWrap={"pretty"}>{ability.ability.effect_entries.find((e) => e.language.name === language)?.short_effect || null}</DataList.ItemValue>
+                </DataList.Item>
+              )
+            })}
+          </DataList.Root>
+        </VStack>
+        <VStack alignItems="flex-start" w={"100%"}>
+          <Heading size="lg" color="#A16CCF">
+            Base Stats
+          </Heading>
+          <DataList.Root orientation="horizontal" style={{ width: "100%" }}>
+            {pokemon.stats.map((stat) => (
+              <DataList.Item key={stat.stat.name}>
+                <DataList.ItemLabel fontWeight={500}>{stat.stat.name.split("-").map(capitalizeFirstLetter).join(" ")}</DataList.ItemLabel>
+                <DataList.ItemValue>
                   <Badge colorPalette={stat.base_stat >= 100 ? "green" : stat.base_stat >= 60 ? "yellow" : "red"} p={2}>
                     {stat.base_stat}
                   </Badge>
-                </Flex>
-              ))}
-            </Flex>
-          </VStack>
-          <VStack alignItems="flex-start">
-            <Heading size="lg" color="#A16CCF">
-              Abilities
-            </Heading>
-            <DataList.Root orientation={"vertical"} style={{ overflowY: "auto" }}>
-              {pokemon.abilities.map((ability) => {
-                return (
-                  <DataList.Item key={ability.ability.name}>
-                    <DataList.ItemLabel fontWeight={500}>{ability.ability.names.find((n) => n.language.name === language)?.name || ability.ability.name}</DataList.ItemLabel>
-                    <DataList.ItemValue textWrap={"pretty"}>{ability.ability.effect_entries.find((e) => e.language.name === language)?.short_effect || null}</DataList.ItemValue>
-                  </DataList.Item>
-                )
-              })}
-            </DataList.Root>
-          </VStack>
-        </Flex>
+                </DataList.ItemValue>
+              </DataList.Item>
+            ))}
+          </DataList.Root>
+        </VStack>
+      </Flex>
+      <Flex flexDirection={"column"} p={4} gap={4} alignItems="center" justifyContent="flex-start" maxWidth="400px" height={"50%"} flex={1}>
+        <PokemonMoves title="Moves" moves={pokemon.moves} />
       </Flex>
     </Flex>
   )

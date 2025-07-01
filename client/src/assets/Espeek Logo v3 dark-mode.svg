@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 80 210 80" width="210" height="80">
+  <defs>
+    <!-- Head gradient (deep purple → soft pink) -->
+    <linearGradient id="espeonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9B59B6" />
+      <stop offset="100%" stop-color="#F5B7B1" />
+    </linearGradient>
+
+    <!-- Text gradient: dark purple → soft pink -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#dcc1ff" />
+      <stop offset="100%" stop-color="#F5B7B1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Espeon head -->
+  <g transform="translate(0,50)">
+    <path d="M120,100 c20,10 30,-20 60,0" stroke="url(#espeonGradient)" stroke-width="4" fill="none"
+      stroke-linecap="round" />
+    <circle cx="100" cy="70" r="40" fill="url(#espeonGradient)" />
+    <polygon points="100,50 115,70 100,90 85,70" fill="#E74C3C" />
+  </g>
+
+  <!-- Logo text -->
+  <text x="10" y="145" font-family="Poppins, sans-serif" font-size="60" font-weight="700" fill="url(#textGradient)">
+    Espeek
+  </text>
+</svg>

@@ -15,6 +15,7 @@ const typeDefs = gql(
 async function startApolloServer() {
   const server = new ApolloServer({ typeDefs, resolvers });
   const { url } = await startStandaloneServer(server, {
+    listen: { host: "0.0.0.0", port: 4000 }, // 👈 Add this line!
     context: async () => {
       const { cache } = server;
       return {

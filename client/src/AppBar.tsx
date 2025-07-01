@@ -1,9 +1,12 @@
 import EspeekLogo from "./assets/Espeek.svg?react" // Importing as a React component
-import { Box, Button, createListCollection, Flex, Heading, HStack, Input, InputGroup, Portal, Select } from "@chakra-ui/react"
-import { SearchIcon } from "lucide-react"
+import { Box, Button, ButtonGroup, CloseButton, createListCollection, Drawer, Flex, Heading, HStack, IconButton, Input, InputGroup, Portal, Select } from "@chakra-ui/react"
+import { HamburgerIcon, PanelLeftIcon, PanelRightIcon, SearchIcon } from "lucide-react"
 import { ColorModeButton } from "./components/ui/color-mode"
 import { useUIStore } from "./stores/UIStore"
 import { GENERATION_OPTIONS, LANGUAGE_OPTIONS } from "./types"
+import PokemonList from "./components/PokemonList"
+import { useEffect, useState } from "react"
+import { usePokemonStore } from "./stores/PokemonStore"
 
 const languageOptions = createListCollection({
   items: LANGUAGE_OPTIONS,
@@ -15,18 +18,68 @@ const generationOptions = createListCollection({
 
 export const AppBar = () => {
   const { language, setLanguage, generation, setGeneration } = useUIStore()
+  const { selectedPokemonID, setSelectedPokemonID } = usePokemonStore()
+
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    setOpen(false)
+  }, [selectedPokemonID])
 
   return (
-    <Box height="60px" display="flex" alignItems="center" justifyContent="flex-start">
+    <Box height="60px" display="flex" alignItems="center" justifyContent="flex-start" px={2}>
       <Flex alignItems={"center"} width="250px" minWidth={"250px"}>
+        <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)} placement="start">
+          <Drawer.Trigger asChild>
+            <IconButton variant={"ghost"} hideFrom={"md"}>
+              <PanelRightIcon size={20} />
+            </IconButton>
+          </Drawer.Trigger>
+          <Portal>
+            <Drawer.Backdrop />
+            <Drawer.Positioner>
+              <Drawer.Content maxW="100%">
+                <Drawer.Header px={4} py={4}>
+                  <EspeekLogo preserveAspectRatio="xMidYMid meet" height={50} width={50} />
+                  <Drawer.Title flex="1">Espeek</Drawer.Title>
+                  <ColorModeButton />
+                  <Drawer.CloseTrigger asChild pos="initial">
+                    <IconButton variant={"ghost"}>
+                      <PanelLeftIcon size={20} />
+                    </IconButton>
+                  </Drawer.CloseTrigger>
+                </Drawer.Header>
+                <Drawer.Body p={2}>
+                  <PokemonList />
+                </Drawer.Body>
+                <Drawer.Footer>
+                  <Flex gap={2} justifyContent="space-between" alignItems="center" hideFrom={"md"} width="100%">
+                    <Button variant={"surface"} fontWeight={"bold"} colorPalette={"red"}>
+                      Pokédex
+                    </Button>
+                    <Button variant={"surface"} fontWeight={"bold"} colorPalette={"yellow"}>
+                      Moves
+                    </Button>
+                    <Button variant={"surface"} fontWeight={"bold"} colorPalette={"green"}>
+                      Types
+                    </Button>
+                    <Button variant={"surface"} fontWeight={"bold"} colorPalette={"purple"}>
+                      Berries
+                    </Button>
+                  </Flex>
+                </Drawer.Footer>
+              </Drawer.Content>
+            </Drawer.Positioner>
+          </Portal>
+        </Drawer.Root>
         <EspeekLogo preserveAspectRatio="xMidYMid meet" height={45} width={75} />
-        <Heading as="h1" size="4xl" color="#A16CCF">
+        <Heading size="4xl" ml={2} color="fg.primary" hideBelow={"md"}>
           Espeek
         </Heading>
       </Flex>
 
       <Flex flex="1" justifyContent="space-between" alignItems="center">
-        <Flex gap={2} alignItems="center">
+        <Flex gap={2} alignItems="center" hideBelow={"md"}>
           <Button variant={"surface"} fontWeight={"bold"} colorPalette={"red"}>
             Pokédex
           </Button>
@@ -41,11 +94,11 @@ export const AppBar = () => {
           </Button>
         </Flex>
 
-        <HStack ml={2}>
-          <InputGroup startElement={<SearchIcon />} maxW={300} minW={"50px"}>
+        <HStack gap={2} alignItems="center" justifyContent="flex-end" width="100%" maxWidth="600px">
+          <InputGroup startElement={<SearchIcon />} maxW={300} hideBelow={"md"}>
             <Input placeholder="Search" borderRadius={"md"} />
           </InputGroup>
-          <Select.Root collection={generationOptions} value={[generation]} onValueChange={(e) => setGeneration(e.value[0])} minW={"50px"}>
+          <Select.Root collection={generationOptions} value={[generation]} onValueChange={(e) => setGeneration(e.value[0])} width={100}>
             <Select.HiddenSelect />
             <Select.Control>
               <Select.Trigger>
@@ -68,7 +121,7 @@ export const AppBar = () => {
               </Select.Positioner>
             </Portal>
           </Select.Root>
-          <Select.Root collection={languageOptions} value={[language]} onValueChange={(e) => setLanguage(e.value[0])} minW={"50px"}>
+          <Select.Root collection={languageOptions} value={[language]} onValueChange={(e) => setLanguage(e.value[0])} hideBelow={"md"}>
             <Select.HiddenSelect />
             <Select.Control>
               <Select.Trigger>
@@ -91,7 +144,7 @@ export const AppBar = () => {
               </Select.Positioner>
             </Portal>
           </Select.Root>
-          <ColorModeButton mr={2} />
+          <ColorModeButton mr={2} hideBelow={"md"} />
         </HStack>
       </Flex>
     </Box>

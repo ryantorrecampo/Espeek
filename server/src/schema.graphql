@@ -84,7 +84,7 @@ type PokemonCries {
   "The latest depiction of this Pokémon's cry."
   latest: String!
   "The legacy depiction of this Pokémon's cry."
-  legacy: String!
+  legacy: String
 }
 
 type PokemonType {
