@@ -11,6 +11,16 @@ export const resolvers: Resolvers = {
     generation: (_, { generationNumber }, { dataSources }) => {
       return dataSources.pokeAPI.getGeneration(generationNumber);
     },
+    generations: async (_, { generationNumbers }, { dataSources }) => {
+      return Promise.all(
+        generationNumbers.map((num: number) =>
+          dataSources.pokeAPI.getGeneration(num)
+        )
+      );
+    },
+    evolutionChain: (_, { id }, { dataSources }) => {
+      return dataSources.pokeAPI.getEvolutionChain(id);
+    },
   },
   PokemonSpecies: {
     // This resolver is called for every 'id' field on a 'PokemonSpecies' object
@@ -29,16 +39,44 @@ export const resolvers: Resolvers = {
     },
   },
   Pokemon: {
-    artwork: (parent) => {
-      const id = parent.id;
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
-    },
     names: async (parent, _, { dataSources }) => {
       const species = await dataSources.pokeAPI.getPokemonSpecies(parent.id);
       return species.names;
     },
+    moves: async (parent, _, { dataSources }) => {
+      const moveEntries = parent.moves; // These come from the API, e.g., [{ move: { name, url } }]
+
+      // Use a cache or batch-fetch if you can
+      const enrichedMoves = await Promise.all(
+        moveEntries.map(async (entry) => {
+          const moveData = await dataSources.pokeAPI.getMove(entry.move.name);
+          return {
+            ...entry,
+            move: moveData,
+          };
+        })
+      );
+
+      return enrichedMoves;
+    },
+    sprites: (parent) => {
+      // parent is the FULL REST response from PokéAPI
+      const sprites = parent.sprites as any;
+      return {
+        officialArtwork: sprites.other["official-artwork"].front_default,
+        front_default: sprites.front_default,
+        back_default: sprites.back_default,
+        front_shiny: sprites.front_shiny,
+        back_shiny: sprites.back_shiny,
+        showdown: sprites.other.showdown.front_default,
+      };
+    },
   },
   Ability: {
+    effect_entries: async (parent, _, { dataSources }) => {
+      const ability = await dataSources.pokeAPI.getAbility(parent.name);
+      return ability.effect_entries;
+    },
     names: async (parent, _, { dataSources }) => {
       const ability = await dataSources.pokeAPI.getAbility(parent.name);
       return ability.names;

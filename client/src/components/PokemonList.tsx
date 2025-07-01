@@ -1,83 +1,97 @@
-import { useQuery } from "@apollo/client";
-import { GET_GENERATION } from "../graphql/GetPokemonList";
-import _ from "lodash";
-import type { Generation, PokemonSpecies } from "../gql/graphql";
-import { useMemo, useState } from "react";
-import { Stack, Text } from "@chakra-ui/react";
-import { usePokemonStore } from "@/stores/PokemonStore";
-import { useUIStore } from "@/stores/UIStore";
+import { useQuery } from "@apollo/client"
+import { GET_GENERATIONS } from "../graphql/GetPokemonList"
+import _ from "lodash"
+import type { Generation, PokemonSpecies } from "../gql/graphql"
+import { useMemo, useEffect, useRef, useState } from "react"
+import { Box, Input, InputGroup, Stack, Text } from "@chakra-ui/react"
+import { usePokemonStore } from "@/stores/PokemonStore"
+import { useUIStore } from "@/stores/UIStore"
+import { SearchIcon } from "lucide-react"
+import { getGenerationNumbers } from "@/helpers/UIHelpers"
 
-interface PokemonListProps {
-  generationNumber: number;
-}
+function PokemonList() {
+  const { selectedPokemonID, setSelectedPokemonID } = usePokemonStore()
+  const { language, generation } = useUIStore()
+  const selectedElementRef = useRef<HTMLDivElement>(null)
+  const [search, setSearch] = useState("")
+  const generationNumbers = getGenerationNumbers(generation)
 
-function PokemonList({ generationNumber }: PokemonListProps) {
-  const { selectedPokemonID, setSelectedPokemonID } = usePokemonStore();
-  const { language } = useUIStore();
+  const { data, loading, error } = useQuery(GET_GENERATIONS, {
+    variables: { generationNumbers },
+  })
 
-  const [hoverID, setHoverID] = useState<number | null>(null);
+  const generations: Generation[] = data?.generations
 
-  const { loading, error, data } = useQuery(GET_GENERATION, {
-    variables: { generationNumber },
-  });
+  const allSpecies: PokemonSpecies[] = useMemo(() => {
+    if (!generations) return []
+    return generations.filter((g) => generationNumbers.includes(Number(g.id))).flatMap((g) => g.pokemon_species || [])
+  }, [generations, generationNumbers])
 
-  const generation: Generation = data?.generation;
+  const filteredAndSortedSpecies = useMemo(() => {
+    const lower = search.toLowerCase()
+    const filtered = allSpecies.filter((species) => {
+      const defaultName = species.name.toLowerCase()
+      const translatedName = species.names.find((n) => n.language.name === language)?.name.toLowerCase() || ""
+      return defaultName.includes(lower) || translatedName.includes(lower)
+    })
+    return _.sortBy(filtered, (species) => Number(species.id))
+  }, [allSpecies, search, language])
 
-  const sortedPokemonSpecies = useMemo(() => {
-    if (!generation?.pokemon_species) return [];
-    return _.sortBy(generation.pokemon_species, (species: PokemonSpecies) =>
-      Number(species.id)
-    );
-  }, [generation?.pokemon_species]);
+  useEffect(() => {
+    if (selectedPokemonID && selectedElementRef.current && filteredAndSortedSpecies.length > 0) {
+      const isInList = filteredAndSortedSpecies.some((ps) => Number(ps.id) === selectedPokemonID)
+      if (isInList) {
+        const el = selectedElementRef.current
+        const rect = el.getBoundingClientRect()
+        const viewHeight = window.innerHeight || document.documentElement.clientHeight
+        const isFullyInView = rect.top >= 0 && rect.bottom <= viewHeight
+        if (!isFullyInView) {
+          el.scrollIntoView({ behavior: "instant", block: "center" })
+        }
+      }
+    }
+  }, [selectedPokemonID, filteredAndSortedSpecies])
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error! {error.message}</p>;
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>Error! {error.message}</p>
 
   return (
-    <Stack gap={1}>
-      {sortedPokemonSpecies.map((ps: PokemonSpecies) => {
-        return (
-          <Text
-            key={ps.id}
-            onClick={() => setSelectedPokemonID(Number(ps.id))}
-            bg={
-              selectedPokemonID === Number(ps.id)
-                ? "#C798E4"
-                : hoverID === Number(ps.id)
-                ? "bg.muted"
-                : "transparent"
-            }
-            color={selectedPokemonID === Number(ps.id) ? "#402265" : "fg"}
-            cursor="pointer"
-            px={2}
-            py={2}
-            borderRadius="md"
-            transition="background-color 0.1s ease"
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            fontWeight={500}
-            onMouseEnter={() => {
-              if (selectedPokemonID !== Number(ps.id)) {
-                setHoverID(Number(ps.id));
-              }
-            }}
-            onMouseLeave={() => {
-              if (selectedPokemonID !== Number(ps.id)) {
-                setHoverID(null);
-              }
-            }}
-          >
-            <span>{ps.id}</span>
-            <span>
-              {ps?.names?.find((name) => name.language.name === language)
-                ?.name || ps.name}
-            </span>
-          </Text>
-        );
-      })}
+    <Stack height="100%" gap={2} p={2}>
+      <InputGroup startElement={<SearchIcon size={"15px"} />}>
+        <Input placeholder="Search" borderRadius="sm" value={search} onChange={(e) => setSearch(e.target.value)} />
+      </InputGroup>
+      <Box overflowY="auto">
+        {filteredAndSortedSpecies.map((ps) => {
+          const isSelected = selectedPokemonID === Number(ps.id)
+          return (
+            <Box
+              key={ps.id}
+              ref={isSelected ? selectedElementRef : null}
+              onClick={() => setSelectedPokemonID(Number(ps.id))}
+              bg={isSelected ? "bg.card" : "transparent"}
+              color={isSelected ? "fg.primary" : "fg"}
+              cursor="pointer"
+              borderRadius="sm"
+              p={1}
+              transition="background-color 0.05s ease"
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-start"
+              _hover={isSelected ? {} : { bg: "bg.muted" }}
+              gap={2}
+            >
+              <Text fontSize="12px" fontWeight={600} w={10}>
+                {ps.id}
+              </Text>
+              <Text fontSize="16px" fontWeight={600}>
+                {ps.names.find((n) => n.language.name === language)?.name || ps.name}
+              </Text>
+            </Box>
+          )
+        })}
+      </Box>
     </Stack>
-  );
+  )
 }
 
-export default PokemonList;
+export default PokemonList

@@ -1,23 +1,26 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { globalIgnores } from 'eslint/config'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
+import eslint from "@eslint/js"
+import tseslint from "typescript-eslint"
+import prettier from "eslint-config-prettier"
+import reactplug from "eslint-plugin-react"
+export default tseslint.config(
+  { ignores: ["vite-env.d.ts", "vite.config.ts", "*.cjs", ".eslint*"] },
+  eslint.configs.recommended,
+  { plugins: { ["react"]: reactplug } },
+  ...tseslint.configs.recommended,
+  prettier,
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-    ],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      parserOptions: {
+        sourceType: "module",
+        ecmaVersion: 2022,
+      },
     },
-  },
-])
+    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+    rules: {
+      "no-unused-vars": "off",
+      "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-imports": "off",
+    },
+  }
+)

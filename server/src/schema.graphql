@@ -1,12 +1,25 @@
+type Query {
+  "Fetch a pokemon by its pokedex number"
+  pokemon(id: Int, name: String): Pokemon
+  "Fetch a pokemon species by its ID or name"
+  pokemonSpecies(id: Int, name: String): PokemonSpecies
+  "Fetch a generation by its number"
+  generation(generationNumber: Int!): Generation
+  "Fetch generations by their numbers"
+  generations(generationNumbers: [Int!]!): [Generation!]!
+  "Fetch evolution chain by its ID"
+  evolutionChain(id: Int!): EvolutionChain
+}
+
 "A type that represents a pokemon"
 type Pokemon {
   "The pokemon's pokedex ID"
   id: ID!
   "The pokemon's name"
   name: String!
-  "The pokemon's height"
+  "The pokemon's height in decimetres"
   height: Int!
-  "The pokemon's weight"
+  "The pokemon's weight in hectograms"
   weight: Int!
   "A set of cries used to depict this Pokémon in the game."
   cries: PokemonCries!
@@ -16,10 +29,12 @@ type Pokemon {
   abilities: [PokemonAbility!]!
   "A set of sprites used to depict this Pokémon in the game."
   sprites: PokemonSprites!
-  "The artwork depicting this Pokémon."
-  artwork: String!
   "The name of this resource listed in different languages."
   names: [Name!]!
+  "A list of moves along with learn methods and level details pertaining to specific version groups."
+  moves: [PokemonMove!]!
+  "A list of base stat values for this Pokémon."
+  stats: [PokemonStat!]!
 }
 
 type Generation {
@@ -87,10 +102,12 @@ type Type {
 }
 
 type PokemonSprites {
+  "The official artwork of this Pokémon."
+  officialArtwork: String!
   "The default depiction of this Pokémon from the front in battle."
   front_default: String!
   "The shiny depiction of this Pokémon from the front in battle."
-  front_shiny: String
+  front_shiny: String!
   "The female depiction of this Pokémon from the front in battle."
   front_female: String
   "The shiny female depiction of this Pokémon from the front in battle."
@@ -98,11 +115,19 @@ type PokemonSprites {
   "The default depiction of this Pokémon from the back in battle."
   back_default: String!
   "The shiny depiction of this Pokémon from the back in battle."
-  back_shiny: String
+  back_shiny: String!
   "The female depiction of this Pokémon from the back in battle."
   back_female: String
   "The shiny female depiction of this Pokémon from the back in battle."
   back_shiny_female: String
+  "The showdown depiction of this Pokémon."
+  showdown: String!
+  gen1_front_default: String
+  gen1_back_default: String
+  gen2_front_default: String
+  gen2_back_default: String
+  gen3_front_default: String
+  gen3_back_default: String
 }
 
 type PokemonAbility {
@@ -119,13 +144,74 @@ type Ability {
   url: String!
   "The name of this resource listed in different languages."
   names: [Name!]!
+  "The effect of this ability listed in different languages."
+  effect_entries: [VerboseEffect!]!
 }
 
-type Query {
-  "Fetch a pokemon by its pokedex number"
-  pokemon(id: Int, name: String): Pokemon
-  "Fetch a pokemon species by its ID or name"
-  pokemonSpecies(id: Int, name: String): PokemonSpecies
-  "Fetch a generation by its number"
-  generation(generationNumber: Int!): Generation
+type PokemonMove {
+  "The move the Pokémon can learn."
+  move: Move!
+}
+
+type Move {
+  "The move's ID"
+  id: ID!
+  "The move's name"
+  name: String!
+  "The move's url"
+  url: String!
+  "The name of this resource listed in different languages."
+  names: [Name!]!
+  "Power points. The number of times this move can be used."
+  pp: Int
+  "The power of this move."
+  power: Int
+  "The percent value of how likely this move is to be successful."
+  accuracy: Int
+}
+
+type PokemonStat {
+  "The base stat value of this Pokémon."
+  base_stat: Int!
+  "The stat this Pokémon has."
+  stat: Stat!
+}
+
+type Stat {
+  "The stat's name"
+  name: String!
+  "The name of this resource listed in different languages."
+  names: [Name!]!
+}
+
+type EvolutionChain {
+  "The identifier for this resource."
+  id: ID!
+  "The base chain link object."
+  chain: ChainLink!
+}
+
+type ChainLink {
+  "Whether or not this link is for a baby Pokémon. This would only ever be true on the base link."
+  is_baby: Boolean!
+  "The Pokémon species at this point in the evolution chain."
+  species: PokemonSpecies!
+  "All details regarding the specific details of the referenced Pokémon species evolution."
+  evolution_details: [EvolutionDetail!]!
+  "A List of chain objects."
+  evolves_to: [ChainLink!]!
+}
+
+type EvolutionDetail {
+  "The minimum required level of the evolving Pokémon species to evolve into this Pokémon species."
+  min_level: Int
+}
+
+type VerboseEffect {
+  "The effect of the ability in a specific language."
+  effect: String!
+  "short_effect"
+  short_effect: String!
+  "The language this effect is in."
+  language: Language!
 }

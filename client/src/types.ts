@@ -17,10 +17,22 @@ export const TYPE_COLORS: Record<string, string> = {
   dark: "#705746",
   steel: "#B7B7CE",
   fairy: "#D685AD",
-};
+}
 
 export const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "ko", label: "한국어" },
   { value: "ja", label: "日本語" },
-];
+]
+
+export const GENERATION_OPTIONS = [
+  { value: "1", label: "Gen I" },
+  { value: "2", label: "Gen II" },
+  { value: "3", label: "Gen III" },
+  { value: "4", label: "Gen IV" },
+  { value: "5", label: "Gen V" },
+  { value: "6", label: "Gen VI" },
+  { value: "7", label: "Gen VII" },
+  { value: "8", label: "Gen VIII" },
+  { value: "9", label: "Gen IX" },
+]

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from "@apollo/client"
 
 export const GET_GENERATION = gql`
   query GetGeneration($generationNumber: Int!) {
@@ -19,7 +19,29 @@ export const GET_GENERATION = gql`
       }
     }
   }
-`;
+`
+
+export const GET_GENERATIONS = gql`
+  query GetGenerations($generationNumbers: [Int!]!) {
+    generations(generationNumbers: $generationNumbers) {
+      name
+      id
+      main_region {
+        name
+      }
+      pokemon_species {
+        id
+        name
+        names {
+          language {
+            name
+          }
+          name
+        }
+      }
+    }
+  }
+`
 
 export const GET_POKEMON = gql`
   query GetPokemon($pokemonId: Int!) {
@@ -29,10 +51,14 @@ export const GET_POKEMON = gql`
       height
       weight
       abilities {
-        slot
         ability {
           name
-          url
+          effect_entries {
+            short_effect
+            language {
+              name
+            }
+          }
           names {
             name
             language {
@@ -44,8 +70,8 @@ export const GET_POKEMON = gql`
       sprites {
         front_default
         back_default
+        officialArtwork
       }
-      artwork
       types {
         type {
           name
@@ -57,6 +83,29 @@ export const GET_POKEMON = gql`
           name
         }
       }
+      moves {
+        move {
+          id
+          power
+          pp
+          accuracy
+          names {
+            name
+            language {
+              name
+            }
+          }
+        }
+      }
+      cries {
+        legacy
+      }
+      stats {
+        base_stat
+        stat {
+          name
+        }
+      }
     }
   }
-`;
+`
