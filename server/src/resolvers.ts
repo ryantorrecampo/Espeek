@@ -59,18 +59,6 @@ export const resolvers: Resolvers = {
 
       return enrichedMoves;
     },
-    sprites: (parent) => {
-      // parent is the FULL REST response from PokéAPI
-      const sprites = parent.sprites as any;
-      return {
-        officialArtwork: sprites.other["official-artwork"].front_default,
-        front_default: sprites.front_default,
-        back_default: sprites.back_default,
-        front_shiny: sprites.front_shiny,
-        back_shiny: sprites.back_shiny,
-        showdown: sprites.other.showdown.front_default,
-      };
-    },
   },
   Ability: {
     effect_entries: async (parent, _, { dataSources }) => {

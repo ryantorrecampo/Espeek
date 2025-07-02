@@ -67,11 +67,6 @@ export const GET_POKEMON = gql`
           }
         }
       }
-      sprites {
-        front_default
-        back_default
-        officialArtwork
-      }
       types {
         type {
           name

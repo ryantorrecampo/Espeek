@@ -3,7 +3,7 @@ import { GET_GENERATIONS } from "../graphql/GetPokemonList"
 import _ from "lodash"
 import type { Generation, PokemonSpecies } from "../gql/graphql"
 import { useMemo, useEffect, useRef, useState } from "react"
-import { Box, Input, InputGroup, Stack, Text } from "@chakra-ui/react"
+import { Box, CloseButton, Input, InputGroup, Stack, Text } from "@chakra-ui/react"
 import { usePokemonStore } from "@/stores/PokemonStore"
 import { useUIStore } from "@/stores/UIStore"
 import { SearchIcon } from "lucide-react"
@@ -14,6 +14,18 @@ function PokemonList() {
   const { language, generation } = useUIStore()
   const selectedElementRef = useRef<HTMLDivElement>(null)
   const [search, setSearch] = useState("")
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const endElement = search ? (
+    <CloseButton
+      size="xs"
+      onClick={() => {
+        setSearch("")
+        inputRef.current?.focus()
+      }}
+      me="-2"
+    />
+  ) : undefined
   const generationNumbers = getGenerationNumbers(generation)
 
   const { data, loading, error } = useQuery(GET_GENERATIONS, {
@@ -56,9 +68,9 @@ function PokemonList() {
   if (error) return <p>Error! {error.message}</p>
 
   return (
-    <Stack height="100%" gap={4} p={2} w={250}>
-      <InputGroup startElement={<SearchIcon size={"15px"} />}>
-        <Input placeholder="Search" borderRadius="sm" value={search} onChange={(e) => setSearch(e.target.value)} />
+    <Stack height="100%" gap={4} p={2} w={{ smOnly: "100%", md: "250px" }}>
+      <InputGroup startElement={<SearchIcon size={"15px"} />} endElement={endElement}>
+        <Input ref={inputRef} placeholder="Search" borderRadius="sm" value={search} onChange={(e) => setSearch(e.target.value)} />
       </InputGroup>
       <Box overflowY="auto">
         {filteredAndSortedSpecies.map((ps) => {
@@ -80,7 +92,7 @@ function PokemonList() {
               _hover={isSelected ? {} : { bg: "bg.muted" }}
               gap={2}
             >
-              <Text fontSize="12px" fontWeight={600} w={10}>
+              <Text fontSize="12px" fontWeight={600} w={10} color={{ base: isSelected ? "brand.400" : "fg.muted", _dark: isSelected ? "brand.400" : "fg.muted" }}>
                 {ps.id}
               </Text>
               <Text fontSize="16px" fontWeight={600}>

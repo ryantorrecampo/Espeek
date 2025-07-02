@@ -118,8 +118,6 @@ export type Pokemon = {
   name: Scalars['String']['output'];
   /** The name of this resource listed in different languages. */
   names: Array<Name>;
-  /** A set of sprites used to depict this Pokémon in the game. */
-  sprites: PokemonSprites;
   /** A list of base stat values for this Pokémon. */
   stats: Array<PokemonStat>;
   /** A list of details showing types this Pokémon has. */
@@ -160,36 +158,6 @@ export type PokemonSpecies = {
   names: Array<Name>;
   /** The pokemon species' url */
   url: Scalars['String']['output'];
-};
-
-export type PokemonSprites = {
-  __typename?: 'PokemonSprites';
-  /** The default depiction of this Pokémon from the back in battle. */
-  back_default: Scalars['String']['output'];
-  /** The female depiction of this Pokémon from the back in battle. */
-  back_female?: Maybe<Scalars['String']['output']>;
-  /** The shiny depiction of this Pokémon from the back in battle. */
-  back_shiny: Scalars['String']['output'];
-  /** The shiny female depiction of this Pokémon from the back in battle. */
-  back_shiny_female?: Maybe<Scalars['String']['output']>;
-  /** The default depiction of this Pokémon from the front in battle. */
-  front_default: Scalars['String']['output'];
-  /** The female depiction of this Pokémon from the front in battle. */
-  front_female?: Maybe<Scalars['String']['output']>;
-  /** The shiny depiction of this Pokémon from the front in battle. */
-  front_shiny: Scalars['String']['output'];
-  /** The shiny female depiction of this Pokémon from the front in battle. */
-  front_shiny_female?: Maybe<Scalars['String']['output']>;
-  gen1_back_default?: Maybe<Scalars['String']['output']>;
-  gen1_front_default?: Maybe<Scalars['String']['output']>;
-  gen2_back_default?: Maybe<Scalars['String']['output']>;
-  gen2_front_default?: Maybe<Scalars['String']['output']>;
-  gen3_back_default?: Maybe<Scalars['String']['output']>;
-  gen3_front_default?: Maybe<Scalars['String']['output']>;
-  /** The official artwork of this Pokémon. */
-  officialArtwork: Scalars['String']['output'];
-  /** The showdown depiction of this Pokémon. */
-  showdown: Scalars['String']['output'];
 };
 
 export type PokemonStat = {
@@ -370,7 +338,6 @@ export type ResolversTypes = {
   PokemonCries: ResolverTypeWrapper<PokemonCries>;
   PokemonMove: ResolverTypeWrapper<PokemonMove>;
   PokemonSpecies: ResolverTypeWrapper<PokemonSpecies>;
-  PokemonSprites: ResolverTypeWrapper<PokemonSprites>;
   PokemonStat: ResolverTypeWrapper<PokemonStat>;
   PokemonType: ResolverTypeWrapper<PokemonType>;
   Query: ResolverTypeWrapper<{}>;
@@ -399,7 +366,6 @@ export type ResolversParentTypes = {
   PokemonCries: PokemonCries;
   PokemonMove: PokemonMove;
   PokemonSpecies: PokemonSpecies;
-  PokemonSprites: PokemonSprites;
   PokemonStat: PokemonStat;
   PokemonType: PokemonType;
   Query: {};
@@ -476,7 +442,6 @@ export type PokemonResolvers<ContextType = DataSourceContext, ParentType extends
   moves?: Resolver<Array<ResolversTypes['PokemonMove']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   names?: Resolver<Array<ResolversTypes['Name']>, ParentType, ContextType>;
-  sprites?: Resolver<ResolversTypes['PokemonSprites'], ParentType, ContextType>;
   stats?: Resolver<Array<ResolversTypes['PokemonStat']>, ParentType, ContextType>;
   types?: Resolver<Array<ResolversTypes['PokemonType']>, ParentType, ContextType>;
   weight?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -505,26 +470,6 @@ export type PokemonSpeciesResolvers<ContextType = DataSourceContext, ParentType 
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   names?: Resolver<Array<ResolversTypes['Name']>, ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type PokemonSpritesResolvers<ContextType = DataSourceContext, ParentType extends ResolversParentTypes['PokemonSprites'] = ResolversParentTypes['PokemonSprites']> = {
-  back_default?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  back_female?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  back_shiny?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  back_shiny_female?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  front_default?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  front_female?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  front_shiny?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  front_shiny_female?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  gen1_back_default?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  gen1_front_default?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  gen2_back_default?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  gen2_front_default?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  gen3_back_default?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  gen3_front_default?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  officialArtwork?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  showdown?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -587,7 +532,6 @@ export type Resolvers<ContextType = DataSourceContext> = {
   PokemonCries?: PokemonCriesResolvers<ContextType>;
   PokemonMove?: PokemonMoveResolvers<ContextType>;
   PokemonSpecies?: PokemonSpeciesResolvers<ContextType>;
-  PokemonSprites?: PokemonSpritesResolvers<ContextType>;
   PokemonStat?: PokemonStatResolvers<ContextType>;
   PokemonType?: PokemonTypeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

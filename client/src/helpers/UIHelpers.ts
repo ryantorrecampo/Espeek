@@ -8,3 +8,10 @@ export const getGenerationNumbers = (generation: string) => {
   if (!Number.isInteger(genNumber) || genNumber < 1) return []
   return Array.from({ length: genNumber }, (_, i) => i + 1)
 }
+
+export const cleanGameName = (name: string): string => {
+  return name
+    .split("-")
+    .map((part) => capitalizeFirstLetter(part))
+    .join(" & ")
+}

@@ -12,7 +12,7 @@ export const PokemonMoves = ({ title, moves }: PokemonMovesProps) => {
 
   return (
     <VStack w="100%" justifyContent={"flex-start"} alignItems="flex-start" borderRadius="md" bgColor={"bg.card"}>
-      <Heading size="lg" color="#A16CCF">
+      <Heading size="lg" color="fg.primary">
         {title}
       </Heading>
       <Box maxHeight={{ md: "40vh" }} overflowY={{ md: "auto" }} w="100%">

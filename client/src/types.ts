@@ -25,14 +25,18 @@ export const LANGUAGE_OPTIONS = [
   { value: "ja", label: "日本語" },
 ]
 
-export const GENERATION_OPTIONS = [
-  { value: "1", label: "Gen I" },
-  { value: "2", label: "Gen II" },
-  { value: "3", label: "Gen III" },
-  { value: "4", label: "Gen IV" },
-  { value: "5", label: "Gen V" },
-  { value: "6", label: "Gen VI" },
-  { value: "7", label: "Gen VII" },
-  { value: "8", label: "Gen VIII" },
-  { value: "9", label: "Gen IX" },
+type GenerationOption = {
+  value: string
+  label: string
+  description: string
+  key: string
+  games: string[]
+  maxPokemonId: number
+}
+
+export const GENERATION_OPTIONS: GenerationOption[] = [
+  { value: "1", label: "Gen I", description: "Kanto", key: "generation-i", games: ["red-blue", "yellow"], maxPokemonId: 151 },
+  { value: "2", label: "Gen II", description: "Johto", key: "generation-ii", games: ["gold", "silver", "crystal"], maxPokemonId: 251 },
+  { value: "3", label: "Gen III", description: "Hoenn", key: "generation-iii", games: ["ruby-sapphire", "emerald", "firered-leafgreen"], maxPokemonId: 386 },
+  { value: "4", label: "Gen IV", description: "Sinnoh", key: "generation-iv", games: ["diamond-pearl", "platinum"], maxPokemonId: 493 },
 ]

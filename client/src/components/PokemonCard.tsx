@@ -1,13 +1,16 @@
 import type { Pokemon } from "@/gql/graphql"
 import { GET_POKEMON } from "@/graphql/GetPokemonList"
-import { capitalizeFirstLetter } from "@/helpers/UIHelpers"
+import { capitalizeFirstLetter, cleanGameName } from "@/helpers/UIHelpers"
 import { useUIStore } from "@/stores/UIStore"
 import { TYPE_COLORS } from "@/types"
 import { useQuery } from "@apollo/client"
-import { AudioLinesIcon, CircleCheckIcon, HashIcon } from "lucide-react"
-import { Badge, Button, DataList, Flex, Heading, HStack, IconButton, Skeleton, SkeletonCircle, SkeletonText, Stack, useToken, VStack } from "@chakra-ui/react"
-import { PokemonEvolutionChain } from "./PokemonEvolutionChain"
+import { AudioLinesIcon, CircleCheckIcon, HashIcon, SparklesIcon } from "lucide-react"
+import { Badge, Button, DataList, Flex, Heading, HStack, IconButton, Text, Skeleton, SkeletonCircle, SkeletonText, Stack, Switch, useToken, VStack, Progress } from "@chakra-ui/react"
 import { PokemonMoves } from "./PokemonMoves"
+import { getSpritePaths } from "@/helpers/Sprites"
+import { getArtwork } from "@/helpers/Artwork"
+import { Tooltip } from "@/components/ui/tooltip"
+import { useId, useState } from "react"
 
 interface PokemonCardProps {
   pokemonId: number
@@ -19,44 +22,47 @@ const PokemonCard = ({ pokemonId }: PokemonCardProps) => {
     variables: { pokemonId: pokemonId },
   })
   const [primaryFg] = useToken("colors", ["fg.primary"]) // returns the color string
-
+  const [shiny, setShiny] = useState(false)
   const pokemon: Pokemon = data?.pokemon
-
-  if (loading)
-    return (
-      <Stack gap="6" maxW="xs">
-        <HStack width="full">
-          <SkeletonCircle size="10" />
-          <SkeletonText noOfLines={2} />
-        </HStack>
-        <Skeleton height="200px" />
-      </Stack>
-    )
+  const id = useId()
 
   if (error) return <div>Error! {error?.message}</div>
 
   return (
-    <Flex wrap="wrap" height={"fit-content"} bgColor={"bg.card"} borderRadius="md" boxShadow="sm">
-      <Flex flexDirection={"column"} p={4} gap={2} alignItems="center" justifyContent="flex-start" maxWidth="400px">
-        {/* Header */}
-        <VStack backgroundColor={""} justifyContent="space-between" alignItems="center" w={"100%"} maxW="400px">
-          <Flex justifyContent={"space-between"} alignItems="center" w="100%">
-            <Flex gap={2} alignItems="center">
+    <Flex flexDirection={"row"} wrap="wrap" height={"fit-content"} bgColor={"bg.card"} borderRadius="md" boxShadow="sm">
+      <Flex flexDirection={"column"} p={4} gap={2} alignItems="center" justifyContent="flex-start">
+        <Flex justifyContent={"space-between"} alignItems="center" w="100%">
+          <Flex gap={2} alignItems="center">
+            {loading ? (
+              <Skeleton>
+                <SkeletonCircle size="10" />
+              </Skeleton>
+            ) : (
               <Heading size="4xl" color="fg.primary">
                 {pokemon.names.find((n) => n.language.name === language)?.name || pokemon.name}
               </Heading>
-              <IconButton colorPalette={"purple"} variant={"ghost"}>
-                <CircleCheckIcon color={primaryFg} size={15} strokeWidth={2} />
-              </IconButton>
-            </Flex>
-            <Flex alignItems={"center"} gap={1}>
-              <HashIcon color={primaryFg} size={15} strokeWidth={3} />
+            )}
+            <IconButton colorPalette={"purple"} variant={"ghost"}>
+              <CircleCheckIcon color={primaryFg} size={15} strokeWidth={2} />
+            </IconButton>
+          </Flex>
+          <Flex alignItems={"center"} gap={1}>
+            <HashIcon color={primaryFg} size={15} strokeWidth={3} />
+            {loading ? (
+              <SkeletonText noOfLines={1} width="50px" />
+            ) : (
               <Heading size="md" color="fg.primary">
                 {pokemon.id}
               </Heading>
-            </Flex>
+            )}
           </Flex>
-          <Flex justifyContent={"space-between"} alignItems="center" w="100%">
+        </Flex>
+        <Flex justifyContent={"space-between"} alignItems="center" w="100%">
+          {loading ? (
+            <Skeleton>
+              <SkeletonText noOfLines={1} width="50px" />
+            </Skeleton>
+          ) : (
             <HStack gap={4} justifyContent="flex-start" alignItems="center">
               {pokemon.types.map((type) => (
                 <Badge key={type.type.name} backgroundColor={TYPE_COLORS[type.type.name] || "#ccc"} color="bg.muted" fontWeight="bold">
@@ -64,139 +70,154 @@ const PokemonCard = ({ pokemonId }: PokemonCardProps) => {
                 </Badge>
               ))}
             </HStack>
-            <Button
-              variant={"surface"}
-              fontWeight={"bold"}
-              colorPalette={"purple"}
-              style={{
-                height: 30,
-              }}
-              onClick={() => {
-                const audio = new Audio(pokemon.cries.legacy || pokemon.cries.latest)
-                audio.volume = 0.2
-                audio.play()
-              }}
-            >
-              <AudioLinesIcon size={20} />
-            </Button>
-          </Flex>
-          <Flex justifyContent="flex-start" gap={2} alignItems="center" w="100%">
-            <Badge colorPalette={"purple"} p={2}>
-              Height: {pokemon.height / 10} m
-            </Badge>
-            <Badge colorPalette={"purple"} p={2}>
-              Weight: {pokemon.weight / 10} kg
-            </Badge>
-          </Flex>
-        </VStack>
-        <img
-          src={pokemon.sprites.officialArtwork}
-          alt={`${pokemon.name} official artwork`}
-          style={{
-            objectFit: "contain",
-            aspectRatio: "1 / 1",
-            display: "block",
-          }}
-        />
-        <HStack>
-          {/* {pokemonSprites[`gen${generation}_front_default`] && (
-            <img
-              src={pokemonSprites[`gen${generation}_front_default`]}
-              alt={`${pokemon.name} front sprite`}
-              style={{
-                height: "100px",
-                width: "100px",
-                objectFit: "contain",
-                aspectRatio: "1 / 1",
-                display: "block",
-              }}
-            />
-          )} */}
-        </HStack>
+          )}
+          <Button
+            variant={"surface"}
+            fontWeight={"bold"}
+            colorPalette={"purple"}
+            style={{
+              height: 30,
+            }}
+            onClick={() => {
+              const audio = new Audio(pokemon.cries.legacy || pokemon.cries.latest)
+              audio.volume = 0.4
+              audio.play()
+            }}
+          >
+            <AudioLinesIcon size={20} />
+          </Button>
+        </Flex>
+        <Flex justifyContent="space-between" gap={2} alignItems="center" w="100%">
+          {loading ? (
+            <Skeleton>
+              <SkeletonText noOfLines={2} width="150px" />
+            </Skeleton>
+          ) : (
+            <HStack gap={2}>
+              <Badge colorPalette={"purple"} p={2}>
+                Height: {pokemon.height / 10} m
+              </Badge>
+              <Badge colorPalette={"purple"} p={2}>
+                Weight: {pokemon.weight / 10} kg
+              </Badge>
+            </HStack>
+          )}
+          {generation !== "1" && (
+            <Tooltip ids={{ trigger: id }} content="Toggle Shiny Form">
+              <Switch.Root ids={{ root: id }} size="lg" checked={shiny} onCheckedChange={() => setShiny(!shiny)} colorPalette={"brand"}>
+                <Switch.HiddenInput />
+                <Switch.Control>
+                  <Switch.Thumb />
+                  <Switch.Indicator>
+                    <SparklesIcon size={15} color="#FFD700" /> {/* gold/yellow for shiny */}
+                  </Switch.Indicator>
+                </Switch.Control>
+              </Switch.Root>
+            </Tooltip>
+          )}
+        </Flex>
+        {loading ? (
+          <Skeleton>
+            <SkeletonCircle width="150px" />
+          </Skeleton>
+        ) : (
+          <img
+            src={shiny ? getArtwork(pokemon.id).shiny : getArtwork(pokemon.id).default}
+            alt={`${pokemon.name} official artwork`}
+            style={{
+              objectFit: "contain",
+              aspectRatio: "1 / 1",
+              display: "block",
+            }}
+          />
+        )}
       </Flex>
-      <Flex flexDirection={"column"} p={4} gap={4} alignItems="center" justifyContent="flex-start" maxWidth="400px" height={"50%"} flex={1}>
-        <VStack alignItems="flex-start" w={"100%"}>
-          <Heading size="lg" color="#A16CCF">
+      <Flex flexDirection={"column"} p={2} gap={2} alignItems="center" justifyContent="flex-start" w={{ sm: "100%", md: "30%" }} maxW={{ sm: "100%", md: "30%" }}>
+        <VStack alignItems="flex-start" bg={{ base: "brandLight.100", _dark: "brand.900" }} p={2} borderRadius="md" w={"100%"}>
+          <Heading size="lg" color="fg.primary">
             Abilities
           </Heading>
-          <DataList.Root orientation={"vertical"} style={{ overflowY: "auto" }}>
-            {pokemon.abilities.map((ability) => {
-              return (
-                <DataList.Item key={ability.ability.name}>
-                  <DataList.ItemLabel fontWeight={500}>{ability.ability.names.find((n) => n.language.name === language)?.name || ability.ability.name}</DataList.ItemLabel>
-                  <DataList.ItemValue textWrap={"pretty"}>{ability.ability.effect_entries.find((e) => e.language.name === language)?.short_effect || null}</DataList.ItemValue>
-                </DataList.Item>
-              )
-            })}
-          </DataList.Root>
+          {loading ? (
+            <Skeleton>
+              <SkeletonText noOfLines={3} width="100%" />
+            </Skeleton>
+          ) : (
+            <VStack style={{ overflowY: "auto" }}>
+              {pokemon.abilities.map((ability) => {
+                return (
+                  <VStack key={ability.ability.name} alignItems="flex-start" w={"100%"}>
+                    <Heading size={"sm"}>{ability.ability.names.find((n) => n.language.name === language)?.name || ability.ability.name}</Heading>
+                    <Text textStyle={"xs"} textWrap={"pretty"} color={"fg.muted"}>
+                      {ability.ability.effect_entries.find((e) => e.language.name === language)?.short_effect || null}
+                    </Text>
+                  </VStack>
+                )
+              })}
+            </VStack>
+          )}
         </VStack>
-        <VStack alignItems="flex-start" w={"100%"}>
-          <Heading size="lg" color="#A16CCF">
+        <VStack alignItems="flex-start" p={2} w={"100%"}>
+          <Heading size="lg" color="fg.primary">
             Base Stats
           </Heading>
-          <DataList.Root orientation="horizontal" style={{ width: "100%" }}>
-            {pokemon.stats.map((stat) => (
-              <DataList.Item key={stat.stat.name}>
-                <DataList.ItemLabel fontWeight={500}>{stat.stat.name.split("-").map(capitalizeFirstLetter).join(" ")}</DataList.ItemLabel>
-                <DataList.ItemValue>
-                  <Badge colorPalette={stat.base_stat >= 100 ? "green" : stat.base_stat >= 60 ? "yellow" : "red"} p={2}>
-                    {stat.base_stat}
-                  </Badge>
-                </DataList.ItemValue>
-              </DataList.Item>
-            ))}
-          </DataList.Root>
+          <Flex w={"100%"} gap={2} alignItems="flex-start" height={"fit-content"} flexWrap="wrap">
+            {loading ? (
+              <VStack w="100%" gap={2}>
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} height="24px" width="100%" borderRadius="md" />
+                ))}
+              </VStack>
+            ) : (
+              pokemon.stats.map((stat) => {
+                return (
+                  <Progress.Root key={stat.stat.name} maxW="240px" value={stat.base_stat} max={255} w="100%" variant={"subtle"} colorPalette={"purple"}>
+                    <Progress.Label>
+                      <Text textStyle={"xs"} fontWeight={500}>
+                        {stat.stat.name.split("-").map(capitalizeFirstLetter).join(" ")}: {stat.base_stat}
+                      </Text>
+                    </Progress.Label>
+                    <Progress.Track>
+                      <Progress.Range />
+                    </Progress.Track>
+                  </Progress.Root>
+                )
+              })
+            )}
+          </Flex>
         </VStack>
       </Flex>
-      <Flex flexDirection={"column"} p={4} gap={4} alignItems="center" justifyContent="flex-start" maxWidth="400px" height={"50%"} flex={1}>
-        <PokemonMoves title="Moves" moves={pokemon.moves} />
+      <Flex flexDirection={"column"} p={4} gap={4} justifyContent="flex-start" alignItems="flex-start" maxW={{ sm: "100%", md: "30%" }}>
+        <Heading size="lg" color="fg.primary">
+          Sprites
+        </Heading>
+        {loading ? (
+          <VStack gap={2} w="100%">
+            {[...Array(2)].map((_, i) => (
+              <Skeleton key={i} height="120px" width="100%" borderRadius="md" />
+            ))}
+          </VStack>
+        ) : (
+          getSpritePaths(generation, pokemon.id).map((spriteInfo) => {
+            return (
+              <VStack key={`${spriteInfo.game}-${pokemon.id}`} gap={1} alignItems={"center"} w="100%">
+                <Heading size="xs" color="fg.primary">
+                  {cleanGameName(spriteInfo.game)}
+                </Heading>
+                <HStack gap={2} alignItems="center">
+                  {spriteInfo.paths.map((spritePath, index) => (
+                    <img key={index} src={spritePath} alt={`${pokemon.name} sprite`} style={{ height: "100px", width: "100px", objectFit: "contain", aspectRatio: "1 / 1", display: "block" }} />
+                  ))}
+                </HStack>
+              </VStack>
+            )
+          })
+        )}
+      </Flex>
+      <Flex flexDirection={"column"} p={4} gap={4} alignItems="center" justifyContent="flex-start" w={"100%"}>
+        {loading ? <Skeleton height="200px" width="100%" borderRadius="md" /> : <PokemonMoves title="Moves" moves={pokemon.moves} />}
       </Flex>
     </Flex>
   )
 }
 
 export default PokemonCard
-
-{
-  /* <Flex gap={4}>
-        <img
-          src={pokemon.sprites.front_default}
-          alt={`${pokemon.name} front sprite`}
-          style={{
-            height: "100px",
-            width: "100px",
-            objectFit: "contain",
-            aspectRatio: "1 / 1",
-            display: "block",
-          }}
-        />
-        <img
-          src={pokemon.sprites.back_default}
-          alt={`${pokemon.name} back sprite`}
-          style={{
-            height: "100px",
-            width: "100px",
-            objectFit: "contain",
-            aspectRatio: "1 / 1",
-            display: "block",
-          }}
-        />
-      </Flex> */
-}
-{
-  /* <VStack alignItems="flex-start" w="100%" bgColor={"bg.subtle"} borderRadius="md" p={4}>
-        <Heading size="lg" color="#A16CCF">
-          Moves
-        </Heading>
-        <DataList.Root orientation={"horizontal"} style={{ overflowY: "auto", maxHeight: "400px", width: "100%" }}>
-          {pokemon.moves.map((item) => (
-            <DataList.Item key={item.move.id}>
-              <DataList.ItemLabel>{item.move.names.find((n) => n.language.name === language)?.name || item.move.name}</DataList.ItemLabel>
-              <DataList.ItemValue>{item.move.power ? item.move.power : "N/A"}</DataList.ItemValue>
-              <DataList.ItemValue>{item.move.pp ? item.move.pp : "N/A"}</DataList.ItemValue>
-              <DataList.ItemValue>{item.move.accuracy ? item.move.accuracy : "N/A"}</DataList.ItemValue>
-            </DataList.Item>
-          ))}
-        </DataList.Root>
-      </VStack> */
-}

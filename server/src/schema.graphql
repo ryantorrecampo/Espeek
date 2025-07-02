@@ -27,8 +27,6 @@ type Pokemon {
   types: [PokemonType!]!
   "A list of abilities this Pokémon could potentially have."
   abilities: [PokemonAbility!]!
-  "A set of sprites used to depict this Pokémon in the game."
-  sprites: PokemonSprites!
   "The name of this resource listed in different languages."
   names: [Name!]!
   "A list of moves along with learn methods and level details pertaining to specific version groups."
@@ -99,35 +97,6 @@ type Type {
   id: ID!
   "The type's name"
   name: String!
-}
-
-type PokemonSprites {
-  "The official artwork of this Pokémon."
-  officialArtwork: String!
-  "The default depiction of this Pokémon from the front in battle."
-  front_default: String!
-  "The shiny depiction of this Pokémon from the front in battle."
-  front_shiny: String!
-  "The female depiction of this Pokémon from the front in battle."
-  front_female: String
-  "The shiny female depiction of this Pokémon from the front in battle."
-  front_shiny_female: String
-  "The default depiction of this Pokémon from the back in battle."
-  back_default: String!
-  "The shiny depiction of this Pokémon from the back in battle."
-  back_shiny: String!
-  "The female depiction of this Pokémon from the back in battle."
-  back_female: String
-  "The shiny female depiction of this Pokémon from the back in battle."
-  back_shiny_female: String
-  "The showdown depiction of this Pokémon."
-  showdown: String!
-  gen1_front_default: String
-  gen1_back_default: String
-  gen2_front_default: String
-  gen2_back_default: String
-  gen3_front_default: String
-  gen3_back_default: String
 }
 
 type PokemonAbility {
